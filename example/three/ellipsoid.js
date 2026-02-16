@@ -5,7 +5,6 @@ import {
 	Group,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	MeshPhongMaterial,
 	Box3,
@@ -17,6 +16,7 @@ import {
 	LineSegments,
 	EdgesGeometry,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import GUI from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
@@ -31,19 +31,23 @@ const params = {
 
 };
 
-init();
-animate();
+init().then( animate );
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// set up renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );
-	renderer.shadowMap.enabled = true;
+
+	if ( ! renderer.isWebGPURenderer ) {
+
+		renderer.shadowMap.enabled = true;
+
+	}
 
 	document.body.appendChild( renderer.domElement );
 

@@ -3,29 +3,33 @@ import {
 	Scene,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	PCFSoftShadowMap,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 let camera, controls, scene, renderer;
 let dirLight;
 
-init();
-animate();
+init().then( animate );
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = PCFSoftShadowMap;
+
+	if ( ! renderer.isWebGPURenderer ) {
+
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = PCFSoftShadowMap;
+
+	}
 
 	document.body.appendChild( renderer.domElement );
 
@@ -41,18 +45,22 @@ function init() {
 	// lights
 	dirLight = new DirectionalLight( 0xffffff, 1.25 );
 	dirLight.position.set( 1, 2, 3 ).multiplyScalar( 40 );
-	dirLight.castShadow = true;
-	dirLight.shadow.bias = - 0.01;
-	dirLight.shadow.mapSize.setScalar( 2048 );
-
-	const shadowCam = dirLight.shadow.camera;
-	shadowCam.left = - 200;
-	shadowCam.bottom = - 200;
-	shadowCam.right = 200;
-	shadowCam.top = 200;
-	shadowCam.updateProjectionMatrix();
-
 	scene.add( dirLight );
+
+	if ( ! renderer.isWebGPURenderer ) {
+
+		dirLight.castShadow = true;
+		dirLight.shadow.bias = - 0.01;
+		dirLight.shadow.mapSize.setScalar( 2048 );
+
+		const shadowCam = dirLight.shadow.camera;
+		shadowCam.left = - 200;
+		shadowCam.bottom = - 200;
+		shadowCam.right = 200;
+		shadowCam.top = 200;
+		shadowCam.updateProjectionMatrix();
+
+	}
 
 	const ambLight = new AmbientLight( 0xffffff, 0.05 );
 	scene.add( ambLight );

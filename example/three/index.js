@@ -10,7 +10,6 @@ import {
 	Scene,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	CameraHelper,
 	Box3,
@@ -24,6 +23,7 @@ import {
 	OrthographicCamera,
 	Sphere,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { FlyOrbitControls } from './src/controls/FlyOrbitControls.js';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
@@ -73,8 +73,7 @@ const params = {
 
 };
 
-init();
-animate();
+init().then( animate );
 
 function reinstantiateTiles() {
 
@@ -128,12 +127,12 @@ function reinstantiateTiles() {
 
 }
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );
@@ -155,7 +154,7 @@ function init() {
 	secondCamera.position.set( 400, 400, - 400 );
 	secondCamera.lookAt( 0, 0, 0 );
 
-	secondRenderer = new WebGLRenderer( { antialias: true } );
+	secondRenderer = await createRenderer( { antialias: true } );
 	secondRenderer.setPixelRatio( window.devicePixelRatio );
 	secondRenderer.setSize( window.innerWidth, window.innerHeight );
 	secondRenderer.setClearColor( 0x151c1f );
@@ -180,7 +179,7 @@ function init() {
 	thirdPersonCamera.position.set( 50, 40, 40 );
 	thirdPersonCamera.lookAt( 0, 0, 0 );
 
-	thirdPersonRenderer = new WebGLRenderer( { antialias: true } );
+	thirdPersonRenderer = await createRenderer( { antialias: true } );
 	thirdPersonRenderer.setPixelRatio( window.devicePixelRatio );
 	thirdPersonRenderer.setSize( window.innerWidth, window.innerHeight );
 	thirdPersonRenderer.setClearColor( 0x0f1416 );

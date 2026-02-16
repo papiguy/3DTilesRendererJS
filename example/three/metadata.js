@@ -2,7 +2,6 @@ import {
 	Scene,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Vector2,
 	Raycaster,
@@ -11,6 +10,7 @@ import {
 	Sphere,
 	Group,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import {
 	EnvironmentControls,
 	TilesRenderer,
@@ -53,10 +53,10 @@ raycaster.firstHitOnly = true;
 raycaster.params.Points.threshold = 0.05;
 
 // gui parameters
-const apiKey = localStorage.getItem( 'ionApiKey' ) ?? 'put-your-api-key-here';
+const apiKey = import.meta.env.VITE_ION_KEY;
 const params = {
 	accessToken: apiKey,
-	assetId: 2333904,
+	assetId: 96188,
 	reload: () => {
 
 		reinstantiateTiles();
@@ -68,10 +68,9 @@ const params = {
 	highlightAllFeatures: false,
 };
 
-init();
-animate();
+init().then( animate );
 
-function init() {
+async function init() {
 
 	// dom elements
 	meshFeaturesEl = document.getElementById( 'meshFeatures' );
@@ -79,7 +78,7 @@ function init() {
 	structuralMetadataEl = document.getElementById( 'structuralMetadata' );
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );
@@ -143,11 +142,11 @@ function buildGUI() {
 	gui = new GUI();
 	const ionFolder = gui.addFolder( 'ion' );
 	ionFolder.add( params, 'accessToken' );
-	ionFolder.add( params, 'assetId', [ 2333904, 2342602 ] ).onChange( reinstantiateTiles );
+	ionFolder.add( params, 'assetId', [ 96188, 75343 ] ).onChange( reinstantiateTiles );
 	ionFolder.add( params, 'reload' );
 
 	const featureFolder = gui.addFolder( 'features' );
-	if ( params.assetId === 2333904 ) {
+	if ( params.assetId === 96188 ) {
 
 		featureFolder.add( params, 'featureIndex', [ 0, 1 ] );
 		featureFolder.add( params, 'highlightAllFeatures' );

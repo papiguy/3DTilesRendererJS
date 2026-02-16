@@ -1,8 +1,8 @@
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { TilesRenderer, GlobeControls, EnvironmentControls } from '3d-tiles-renderer';
 import { TilesFadePlugin, UpdateOnChangePlugin, XYZTilesPlugin, } from '3d-tiles-renderer/plugins';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -20,13 +20,12 @@ const params = {
 // throttled render function
 const scheduleRender = throttle( render );
 
-init();
-render();
+init().then( render );
 
-function init() {
+async function init() {
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x111111 );
@@ -75,7 +74,7 @@ function initTiles() {
 
 	// tiles
 	tiles = new TilesRenderer();
-	tiles.registerPlugin( new TilesFadePlugin( { maximumFadeOutTiles: 200 } ) );
+	tiles.registerPlugin( new TilesFadePlugin( { maximumFadeOutTiles: 200, renderer } ) );
 	tiles.registerPlugin( new UpdateOnChangePlugin() );
 	tiles.registerPlugin( new XYZTilesPlugin( {
 		center: true,

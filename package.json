@@ -1,5 +1,5 @@
 {
-  "name": "3d-tiles-renderer",
+  "name": "@ni2khanna/3dtilesrendererjs",
   "version": "0.4.21",
   "description": "https://github.com/AnalyticalGraphicsInc/3d-tiles/tree/master/specification",
   "keywords": [
@@ -70,12 +70,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NASA-AMMOS/3DTilesRendererJS.git"
+    "url": "git@github.com:papiguy/3DTilesRendererJS.git"
   },
   "bugs": {
-    "url": "https://github.com/NASA-AMMOS/3DTilesRendererJS/issues"
+    "url": "https://github.com/papiguy/3DTilesRendererJS/issues"
   },
-  "homepage": "https://github.com/NASA-AMMOS/3DTilesRendererJS#readme",
+  "homepage": "https://github.com/papiguy/3DTilesRendererJS#readme",
   "author": "Garrett Johnson <garrett.kjohnson@gmail.com>",
   "license": "Apache-2.0",
   "devDependencies": {
@@ -89,12 +89,12 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.170.0",
-    "@vitejs/plugin-react": "^4.3.2",
+    "@vitejs/plugin-react": "^5.0.0",
     "@vitest/eslint-plugin": "^1.5.1",
     "@babylonjs/core": "^8.47.2",
     "@babylonjs/loaders": "^8.47.2",
     "cesium": "^1.132.0",
-    "concurrently": "^6.2.1",
+    "concurrently": "^9.0.0",
     "eslint": "^9.0.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-react": "^7.37.1",
@@ -106,7 +106,7 @@
     "three": "^0.170.0",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8.48.1",
-    "vite": "^6.2.2",
+    "vite": "^7.0.0",
     "vitest": "^4.0.15"
   },
   "peerDependencies": {

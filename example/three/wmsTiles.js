@@ -1,4 +1,5 @@
-import { Scene, WebGLRenderer, PerspectiveCamera } from 'three';
+import { Scene, PerspectiveCamera } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { TilesRenderer, GlobeControls } from '3d-tiles-renderer';
 import { TilesFadePlugin, UpdateOnChangePlugin, WMSCapabilitiesLoader, WMSTilesPlugin } from '3d-tiles-renderer/plugins';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -19,10 +20,10 @@ let params, capabilities;
 
 init();
 
-function init() {
+async function init() {
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x111111 );
@@ -108,7 +109,7 @@ function rebuildTiles() {
 
 	// WMS overlay layer
 	tiles = new TilesRenderer();
-	tiles.registerPlugin( new TilesFadePlugin() );
+	tiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	tiles.registerPlugin( new UpdateOnChangePlugin() );
 	tiles.registerPlugin(
 		new WMSTilesPlugin( {

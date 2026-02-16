@@ -186,6 +186,7 @@ export class TilesFadePlugin {
 			maximumFadeOutTiles: 50,
 			fadeRootTiles: false,
 			fadeDuration: 250,
+			renderer: null,
 			...options,
 
 		};
@@ -195,9 +196,10 @@ export class TilesFadePlugin {
 
 		this.tiles = null;
 		this.batchedMesh = null;
+		this.renderer = options.renderer;
 		this._quickFadeTiles = new Set();
 		this._fadeManager = new FadeManager();
-		this._fadeMaterialManager = new FadeMaterialManager();
+		this._fadeMaterialManager = new FadeMaterialManager( options.renderer );
 		this._prevCameraTransforms = null;
 		this._fadingOutCount = 0;
 
@@ -368,7 +370,7 @@ export class TilesFadePlugin {
 				const material = otherBatchedMesh.material.clone();
 				material.onBeforeCompile = otherBatchedMesh.material.onBeforeCompile;
 
-				this.batchedMesh = new FadeBatchedMesh( otherBatchedMesh, material );
+				this.batchedMesh = new FadeBatchedMesh( otherBatchedMesh, material, this.renderer );
 				this.tiles.group.add( this.batchedMesh );
 
 			}

@@ -10,16 +10,15 @@ import {
 } from '3d-tiles-renderer/plugins';
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 
 let controls, scene, camera, renderer, tiles;
 const useMars = new URLSearchParams( location.search ).has( 'mars' );
 const assetId = useMars ? '3644333' : '2684829';
 
-init();
-animate();
+init().then( animate );
 
 function reinstantiateTiles() {
 
@@ -35,7 +34,7 @@ function reinstantiateTiles() {
 	tiles.registerPlugin( new CesiumIonAuthPlugin( { apiToken: import.meta.env.VITE_ION_KEY, assetId: assetId, autoRefreshToken: true } ) );
 	tiles.registerPlugin( new TileCompressionPlugin() );
 	tiles.registerPlugin( new UpdateOnChangePlugin() );
-	tiles.registerPlugin( new TilesFadePlugin() );
+	tiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	tiles.group.rotation.x = - Math.PI / 2;
 	scene.add( tiles.group );
 
@@ -44,10 +43,10 @@ function reinstantiateTiles() {
 
 }
 
-function init() {
+async function init() {
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setClearColor( 0x131619 );
 	document.body.appendChild( renderer.domElement );
 

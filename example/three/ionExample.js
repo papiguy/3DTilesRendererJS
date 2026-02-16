@@ -2,7 +2,6 @@ import { EnvironmentControls, TilesRenderer } from '3d-tiles-renderer';
 import { CesiumIonAuthPlugin, GLTFExtensionsPlugin } from '3d-tiles-renderer/plugins';
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Vector3,
 	Quaternion,
@@ -10,23 +9,22 @@ import {
 	DataTexture,
 	EquirectangularReflectionMapping
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
 let camera, controls, scene, renderer, tiles;
 
-const apiKey = localStorage.getItem( 'ionApiKey' ) ?? 'put-your-api-key-here';
+const apiKey = import.meta.env.VITE_ION_KEY;
 
 const params = {
-	ionAssetId: '40866',
-	// ionAssetId: '2333904',
-	// ionAssetId: '2342602',
+	ionAssetId: '96188',
+	// ionAssetId: '75343',
 	ionAccessToken: apiKey,
 	reload: reinstantiateTiles,
 };
 
-init();
-animate();
+init().then( animate );
 
 function rotationBetweenDirections( dir1, dir2 ) {
 
@@ -96,7 +94,7 @@ function reinstantiateTiles() {
 
 }
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
@@ -107,7 +105,7 @@ function init() {
 	scene.environment = env;
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setClearColor( 0x151c1f );
 
 	document.body.appendChild( renderer.domElement );

@@ -1,9 +1,9 @@
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 	OrthographicCamera,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { EnvironmentControls, TilesRenderer, CameraTransitionManager } from '3d-tiles-renderer';
 import { DeepZoomImagePlugin, UpdateOnChangePlugin } from '3d-tiles-renderer/plugins';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -20,13 +20,12 @@ const params = {
 
 };
 
-init();
-render();
+init().then( render );
 
-function init() {
+async function init() {
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x111111 );

@@ -3,7 +3,6 @@ import {
 	Scene,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Box3,
 	Raycaster,
@@ -21,6 +20,7 @@ import {
 	RingGeometry,
 	Sphere,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
@@ -43,12 +43,12 @@ const params = {
 
 init();
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true }, { forceWebGL: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0xbbbbbb );

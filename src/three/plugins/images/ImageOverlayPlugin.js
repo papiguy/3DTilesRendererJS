@@ -5,7 +5,7 @@ import { XYZImageSource } from './sources/XYZImageSource.js';
 import { QuadKeyImageSource } from './sources/QuadKeyImageSource.js';
 import { TMSImageSource } from './sources/TMSImageSource.js';
 import { getMeshesCartographicRange, getMeshesPlanarRange } from './overlays/utils.js';
-import { wrapOverlaysMaterial } from './overlays/wrapOverlaysMaterial.js';
+import { createOverlayMaterial } from './overlays/OverlayMaterialFactory.js';
 import { GeometryClipper } from '../utilities/GeometryClipper.js';
 import { WMTSImageSource } from './sources/WMTSImageSource.js';
 import { MemoryUtils } from '3d-tiles-renderer/three';
@@ -49,6 +49,7 @@ export class ImageOverlayPlugin {
 			overlays = [],
 			resolution = 256,
 			enableTileSplitting = true,
+			renderer = null,
 		} = options;
 
 		// plugin needs to run before other plugins that fetch data since content
@@ -59,6 +60,7 @@ export class ImageOverlayPlugin {
 		// options
 		this.resolution = resolution;
 		this._enableTileSplitting = enableTileSplitting;
+		this.renderer = renderer;
 		this.overlays = [];
 
 		// internal
@@ -923,7 +925,7 @@ export class ImageOverlayPlugin {
 
 			if ( c.material ) {
 
-				const params = wrapOverlaysMaterial( c.material, c.material.onBeforeCompile );
+				const params = createOverlayMaterial( c.material, this.renderer, c.material.onBeforeCompile );
 				this.meshParams.set( c, params );
 
 			}

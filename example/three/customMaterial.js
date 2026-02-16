@@ -3,7 +3,6 @@ import {
 	Scene,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Box3,
 	OrthographicCamera,
@@ -13,6 +12,7 @@ import {
 	PCFSoftShadowMap,
 	Sphere,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
@@ -117,8 +117,7 @@ const topoShader = {
 
 };
 
-init();
-animate();
+init().then( animate );
 
 function updateMaterial( scene ) {
 
@@ -137,13 +136,37 @@ function updateMaterial( scene ) {
 					c.castShadow = false;
 					break;
 				case GRADIENT:
-					c.material = new ShaderMaterial( gradientShader );
+					if ( renderer.isWebGPURenderer ) {
+
+						c.material = new MeshStandardMaterial( {
+							color: 0xb0b7c0,
+							flatShading: false,
+						} );
+
+					} else {
+
+						c.material = new ShaderMaterial( gradientShader );
+
+					}
+
 					c.material.side = 2;
 					c.receiveShadow = false;
 					c.castShadow = false;
 					break;
 				case TOPOGRAPHIC_LINES:
-					c.material = new ShaderMaterial( topoShader );
+					if ( renderer.isWebGPURenderer ) {
+
+						c.material = new MeshStandardMaterial( {
+							color: 0xaab5bf,
+							flatShading: true,
+						} );
+
+					} else {
+
+						c.material = new ShaderMaterial( topoShader );
+
+					}
+
 					c.material.side = 2;
 					c.material.flatShading = true;
 					c.receiveShadow = false;
@@ -152,8 +175,8 @@ function updateMaterial( scene ) {
 				case LIGHTING:
 					c.material = new MeshStandardMaterial();
 					c.material.side = 2;
-					c.receiveShadow = true;
-					c.castShadow = true;
+					c.receiveShadow = ! renderer.isWebGPURenderer;
+					c.castShadow = ! renderer.isWebGPURenderer;
 
 			}
 
@@ -212,17 +235,22 @@ function initTiles() {
 
 }
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = PCFSoftShadowMap;
+
+	if ( ! renderer.isWebGPURenderer ) {
+
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = PCFSoftShadowMap;
+
+	}
 
 	document.body.appendChild( renderer.domElement );
 
@@ -240,21 +268,26 @@ function init() {
 	// lights
 	dirLight = new DirectionalLight( 0xffffff, 1.25 );
 	dirLight.position.set( 1, 2, 3 ).multiplyScalar( 40 );
-	dirLight.castShadow = true;
-	dirLight.shadow.bias = - 0.01;
-	dirLight.shadow.mapSize.setScalar( 2048 );
-
-	const shadowCam = dirLight.shadow.camera;
-	shadowCam.left = - 200;
-	shadowCam.bottom = - 200;
-	shadowCam.right = 200;
-	shadowCam.top = 200;
-	shadowCam.updateProjectionMatrix();
-
 	scene.add( dirLight );
 
 	const ambLight = new AmbientLight( 0xffffff, 0.05 );
 	scene.add( ambLight );
+
+	// shadows only for WebGL (WebGPU shadow maps are not fully supported in this setup)
+	if ( ! renderer.isWebGPURenderer ) {
+
+		dirLight.castShadow = true;
+		dirLight.shadow.bias = - 0.01;
+		dirLight.shadow.mapSize.setScalar( 2048 );
+
+		const shadowCam = dirLight.shadow.camera;
+		shadowCam.left = - 200;
+		shadowCam.bottom = - 200;
+		shadowCam.right = 200;
+		shadowCam.top = 200;
+		shadowCam.updateProjectionMatrix();
+
+	}
 
 	box = new Box3();
 	sphere = new Sphere();
@@ -383,9 +416,9 @@ function render() {
 	updateOrthoCamera();
 
 	statsContainer.innerText =
-		`Geometries: ${ renderer.info.memory.geometries } ` +
-		`Textures: ${ renderer.info.memory.textures } ` +
-		`Programs: ${ renderer.info.programs.length } `;
+		`Geometries: ${ renderer.info.memory?.geometries ?? 0 } ` +
+		`Textures: ${ renderer.info.memory?.textures ?? 0 } ` +
+		`Programs: ${ renderer.info.programs?.length ?? 0 } `;
 
 	renderer.render( scene, params.orthographic ? orthoCamera : camera );
 

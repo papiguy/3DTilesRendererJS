@@ -1,6 +1,7 @@
 
 import { GlobeControls, TilesRenderer, CAMERA_FRAME, EnvironmentControls } from '3d-tiles-renderer';
-import { Scene, WebGLRenderer, PerspectiveCamera, MathUtils, Sphere, TextureUtils, DirectionalLight, DataTexture, EquirectangularReflectionMapping } from 'three';
+import { Scene, PerspectiveCamera, MathUtils, Sphere, TextureUtils, DirectionalLight, DataTexture, EquirectangularReflectionMapping } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { estimateBytesUsed } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
@@ -121,12 +122,20 @@ function updateThreeStats() {
 					const value = material[ key ];
 					if ( value && value.isTexture ) {
 
-						const { format, type, image } = value;
-						const { width, height } = image;
+						try {
 
-						let bytes = TextureUtils.getByteLength( width, height, format, type );
-						bytes *= value.generateMipmaps ? 4 / 3 : 1;
-						textureBytes += bytes;
+							const { format, type, image } = value;
+							const { width, height } = image;
+
+							let bytes = TextureUtils.getByteLength( width, height, format, type );
+							bytes *= value.generateMipmaps ? 4 / 3 : 1;
+							textureBytes += bytes;
+
+						} catch {
+
+							// TextureUtils.getByteLength may not support WebGPU format enums
+
+						}
 
 					}
 
@@ -243,7 +252,7 @@ function updateCesiumStats() {
 async function initThree() {
 
 	// renderer
-	const renderer = new WebGLRenderer( { antialias: true } );
+	const renderer = await createRenderer( { antialias: true } );
 	renderer.setClearColor( 0 );
 	threeContainer.appendChild( renderer.domElement );
 

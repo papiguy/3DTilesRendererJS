@@ -1,10 +1,10 @@
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 	OrthographicCamera,
 	Group,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { TilesFadePlugin } from '3d-tiles-renderer/plugins';
 import { EnvironmentControls, TilesRenderer, CameraTransitionManager } from '3d-tiles-renderer';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -27,13 +27,12 @@ const params = {
 
 };
 
-init();
-render();
+init().then( render );
 
-function init() {
+async function init() {
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0xd8cec0 );
@@ -130,13 +129,13 @@ function reinstantiateTiles() {
 	groundTiles.lruCache.minSize = 900;
 	groundTiles.lruCache.maxSize = 1300;
 	groundTiles.errorTarget = 12;
-	groundTiles.registerPlugin( new TilesFadePlugin() );
+	groundTiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	groundTiles.setCamera( transition.camera );
 
 	skyTiles = new TilesRenderer( 'https://raw.githubusercontent.com/NASA-AMMOS/3DTilesSampleData/master/msl-dingo-gap/0528_0260184_to_s64o256_colorize/0528_0260184_to_s64o256_sky/0528_0260184_to_s64o256_sky_tileset.json' );
 	skyTiles.fetchOptions.mode = 'cors';
 	skyTiles.lruCache = groundTiles.lruCache;
-	skyTiles.registerPlugin( new TilesFadePlugin() );
+	skyTiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	skyTiles.setCamera( transition.camera );
 
 	tilesParent.add( groundTiles.group, skyTiles.group );

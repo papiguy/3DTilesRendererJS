@@ -71,6 +71,32 @@ See the dedicated documentation for information on using the project with [@reac
 npm install 3d-tiles-renderer --save
 ```
 
+## Development
+
+Running examples locally:
+
+```bash
+npm install       # install dependencies
+npm start         # dev server at localhost:5173
+```
+
+Then open `http://localhost:5173/three/<demo>.html` (e.g. `fadingTiles.html`).
+
+Demos that use Cesium Ion or Google Maps require API keys. Create a `.env` file in the repo root:
+
+```
+VITE_ION_KEY=<your-cesium-ion-key>
+```
+
+Building and testing:
+
+```bash
+npm run build-lib       # build library to /build
+npm run build-examples  # build examples to /example/bundle
+npm test                # TypeScript type check + Vitest tests
+npm run lint            # ESLint + TypeScript --noEmit
+```
+
 ## Basic TilesRenderer
 
 Setting up a basic application with a 3D Tileset.

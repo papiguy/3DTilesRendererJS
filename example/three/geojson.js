@@ -1,4 +1,5 @@
-import { Scene, WebGLRenderer, PerspectiveCamera, MathUtils } from 'three';
+import { Scene, PerspectiveCamera, MathUtils } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { TilesRenderer, GlobeControls, CAMERA_FRAME } from '3d-tiles-renderer';
 import {
 	GeoJSONOverlay,
@@ -73,12 +74,11 @@ const params = {
 	mode: 'overlay',
 };
 
-init();
-render();
+init().then( render );
 
-function init() {
+async function init() {
 
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x111111 );
@@ -97,7 +97,7 @@ function init() {
 	// XYZ base layer
 	tiles = new TilesRenderer();
 	tiles.registerPlugin( new UpdateOnChangePlugin() );
-	tiles.registerPlugin( new TilesFadePlugin() );
+	tiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	tiles.registerPlugin(
 		new XYZTilesPlugin( {
 			center: true,

@@ -207,7 +207,7 @@ export class TileCompressionPlugin {
 
 					const vertCount = attributes.position.count;
 					const index = geometry.index;
-					const type = vertCount > 65535 ? Uint32Array : vertCount > 255 ? Uint16Array : Uint8Array;
+					const type = vertCount > 65535 ? Uint32Array : Uint16Array;
 					if ( ! ( index.array instanceof type ) ) {
 
 						const array = new type( geometry.index.count );

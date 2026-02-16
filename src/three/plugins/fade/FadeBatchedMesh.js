@@ -1,17 +1,16 @@
 import { PassThroughBatchedMesh } from './PassThroughBatchedMesh.js';
 import { RGFormat, UnsignedByteType, DataTexture } from 'three';
-import { wrapFadeMaterial } from './wrapFadeMaterial.js';
+import { createFadeMaterial } from './FadeMaterialFactory.js';
 
 // BatchedMesh instance that can fade materials
 export class FadeBatchedMesh extends PassThroughBatchedMesh {
 
-	constructor( ...args ) {
+	constructor( batchedMesh, material, renderer = null ) {
 
-		super( ...args );
+		super( batchedMesh, material );
 
 		// construct a version of the material that supports fading
-		const material = this.material;
-		const params = wrapFadeMaterial( material, material.onBeforeCompile );
+		const params = createFadeMaterial( material, renderer, material.onBeforeCompile );
 		material.defines.FEATURE_FADE = 1;
 		material.defines.USE_BATCHING_FRAG = 1;
 		material.needsUpdate = true;
@@ -19,6 +18,7 @@ export class FadeBatchedMesh extends PassThroughBatchedMesh {
 		// fade parameters
 		this.fadeTexture = null;
 		this._fadeParams = params;
+		this.renderer = renderer;
 
 	}
 

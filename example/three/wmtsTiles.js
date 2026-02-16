@@ -1,8 +1,8 @@
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { TilesRenderer, GlobeControls, EnvironmentControls } from '3d-tiles-renderer';
 import { TilesFadePlugin, UpdateOnChangePlugin, WMTSCapabilitiesLoader, WMTSTilesPlugin } from '3d-tiles-renderer/plugins';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
@@ -14,13 +14,12 @@ let controls, scene, renderer;
 let tiles, camera, gui;
 let params, capabilities;
 
-init();
-render();
+init().then( render );
 
-function init() {
+async function init() {
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x111111 );
@@ -162,7 +161,7 @@ function rebuildTiles() {
 
 	// tiles
 	tiles = new TilesRenderer();
-	tiles.registerPlugin( new TilesFadePlugin() );
+	tiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	tiles.registerPlugin( new UpdateOnChangePlugin() );
 	tiles.registerPlugin( new WMTSTilesPlugin( {
 		shape: params.planar ? 'planar' : 'ellipsoid',

@@ -4,13 +4,13 @@ import {
 } from '3d-tiles-renderer';
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Group,
 	TextureLoader,
 	MeshBasicMaterial,
 	SRGBColorSpace,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { JPLLandformSiteSceneLoader } from './src/jpl/JPLLandformSceneLoader.js';
 import { TextureOverlayMaterialMixin } from './src/plugins/overlays/TextureOverlayMaterial.js';
@@ -53,15 +53,14 @@ const params = {
 
 };
 
-init();
-render();
+init().then( render );
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0xd8cec0 );

@@ -2,11 +2,11 @@ import { GeoUtils, WGS84_ELLIPSOID, TilesRenderer } from '3d-tiles-renderer';
 import { TilesFadePlugin, TileCompressionPlugin, GLTFExtensionsPlugin, CesiumIonAuthPlugin, ReorientationPlugin } from '3d-tiles-renderer/plugins';
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Raycaster,
 	MathUtils,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -15,8 +15,7 @@ let camera, controls, scene, renderer, tiles;
 const raycaster = new Raycaster();
 raycaster.firstHitOnly = true;
 
-init();
-animate();
+init().then( animate );
 
 function reinstantiateTiles() {
 
@@ -31,7 +30,7 @@ function reinstantiateTiles() {
 	tiles = new TilesRenderer();
 	tiles.registerPlugin( new CesiumIonAuthPlugin( { apiToken: import.meta.env.VITE_ION_KEY, assetId: '2275207', autoRefreshToken: true } ) );
 	tiles.registerPlugin( new TileCompressionPlugin() );
-	tiles.registerPlugin( new TilesFadePlugin() );
+	tiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	tiles.registerPlugin( new GLTFExtensionsPlugin( {
 		// Note the DRACO compression files need to be supplied via an explicit source.
 		// We use unpkg here but in practice should be provided by the application.
@@ -55,12 +54,12 @@ function reinstantiateTiles() {
 
 }
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setClearColor( 0x151c1f );
 
 	document.body.appendChild( renderer.domElement );

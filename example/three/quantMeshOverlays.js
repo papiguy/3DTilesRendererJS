@@ -11,11 +11,11 @@ import {
 } from '3d-tiles-renderer/plugins';
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 	AmbientLight,
 	DirectionalLight,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 
@@ -37,8 +37,7 @@ const params = {
 	reload: reinstantiateTiles,
 };
 
-init();
-animate();
+init().then( animate );
 
 function reinstantiateTiles() {
 
@@ -58,7 +57,7 @@ function reinstantiateTiles() {
 
 	tiles = new TilesRenderer();
 	tiles.registerPlugin( new CesiumIonAuthPlugin( { apiToken: import.meta.env.VITE_ION_KEY, assetId: '1', autoRefreshToken: true } ) );
-	tiles.registerPlugin( new TilesFadePlugin() );
+	tiles.registerPlugin( new TilesFadePlugin( { renderer } ) );
 	tiles.registerPlugin( new ImageOverlayPlugin( {
 		renderer,
 		overlays: [ washingtonOverlay ],
@@ -76,10 +75,10 @@ function reinstantiateTiles() {
 
 }
 
-function init() {
+async function init() {
 
 	// renderer
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setClearColor( 0x151c1f );
 	document.body.appendChild( renderer.domElement );
 

@@ -1,11 +1,12 @@
-import { Color, Matrix4, WebGLRenderer } from 'three';
+import { Color, Matrix4, WebGLRenderer, Renderer } from 'three';
 import { WMTSCapabilitiesResult, WMTSLayer, WMTSTileMatrixSet } from '../loaders/WMTSCapabilitiesLoader.js';
 
 export class ImageOverlayPlugin {
 
-	constructor( options: {
-		overlays: Array<ImageOverlay>,
-		renderer: WebGLRenderer,
+	constructor( options?: {
+		overlays?: Array<ImageOverlay>,
+		/** Renderer instance - supports both WebGLRenderer and WebGPURenderer */
+		renderer?: WebGLRenderer | Renderer | null,
 		resolution?: number,
 		enableTileSplitting?: boolean,
 		alphaMask?: boolean,			// false = fade to the layer below, true = use only alpha to fade all layers underneath

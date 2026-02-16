@@ -3,7 +3,6 @@ import {
 	Scene,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Box3,
 	OrthographicCamera,
@@ -12,6 +11,7 @@ import {
 	PCFSoftShadowMap,
 	Sphere,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import Stats from 'three/examples/jsm/libs/stats.module.js';
@@ -31,8 +31,7 @@ const params = {
 
 };
 
-init();
-animate();
+init().then( animate );
 
 function onLoadModel( { scene } ) {
 
@@ -41,8 +40,8 @@ function onLoadModel( { scene } ) {
 		if ( c.isMesh ) {
 
 			c.material = new MeshStandardMaterial();
-			c.castShadow = true;
-			c.receiveShadow = true;
+			c.castShadow = ! renderer.isWebGPURenderer;
+			c.receiveShadow = ! renderer.isWebGPURenderer;
 
 		}
 
@@ -64,17 +63,22 @@ function onDisposeModel( scene ) {
 
 }
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = PCFSoftShadowMap;
+
+	if ( ! renderer.isWebGPURenderer ) {
+
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = PCFSoftShadowMap;
+
+	}
 
 	document.body.appendChild( renderer.domElement );
 
@@ -92,19 +96,23 @@ function init() {
 	// lights
 	dirLight = new DirectionalLight( 0xffffff, 1.25 );
 	dirLight.position.set( - 100, 40, 10 );
-	dirLight.castShadow = true;
-	dirLight.shadow.bias = - 1e-4;
-	dirLight.shadow.normalBias = 0.2;
-	dirLight.shadow.mapSize.setScalar( 2048 );
-
-	const shadowCam = dirLight.shadow.camera;
-	shadowCam.left = - 120;
-	shadowCam.bottom = - 120;
-	shadowCam.right = 120;
-	shadowCam.top = 120;
-	shadowCam.updateProjectionMatrix();
-
 	scene.add( dirLight );
+
+	if ( ! renderer.isWebGPURenderer ) {
+
+		dirLight.castShadow = true;
+		dirLight.shadow.bias = - 1e-4;
+		dirLight.shadow.normalBias = 0.2;
+		dirLight.shadow.mapSize.setScalar( 2048 );
+
+		const shadowCam = dirLight.shadow.camera;
+		shadowCam.left = - 120;
+		shadowCam.bottom = - 120;
+		shadowCam.right = 120;
+		shadowCam.top = 120;
+		shadowCam.updateProjectionMatrix();
+
+	}
 
 	const ambLight = new AmbientLight( 0xffffff, 0.05 );
 	scene.add( ambLight );

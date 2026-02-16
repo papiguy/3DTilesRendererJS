@@ -29,3 +29,8 @@ export * from './gltf/metadata/classes/StructuralMetadata.js';
 // loaders
 export * from './loaders/WMTSCapabilitiesLoader.js';
 export * from './loaders/WMSCapabilitiesLoader.js';
+
+// material factories for WebGL/WebGPU support
+export * from './fade/FadeMaterialFactory.js';
+export * from './images/overlays/OverlayMaterialFactory.js';
+export * from './gltf/metadata/utilities/TextureReadUtilityFactory.js';

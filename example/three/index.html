@@ -1,13 +1,65 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		<meta charset="utf-8"/>
-
-		<title>3D Tiles Renderer Options Example</title>
-		<link rel="stylesheet" href="../styles.css">
-    </head>
-    <body>
-        <script src="./index.js" type="module"></script>
-    </body>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>3D Tiles Renderer - Examples Directory</title>
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body {
+			font-family: Arial, Helvetica, sans-serif;
+			background: #151c1f;
+			color: #eee;
+			padding: 2em;
+			max-width: 900px;
+			margin: 0 auto;
+		}
+		h1 { margin-bottom: 0.25em; }
+		p.subtitle { color: #999; margin-bottom: 1.5em; }
+		table { width: 100%; border-collapse: collapse; }
+		th, td { text-align: left; padding: 0.5em 0.75em; }
+		th { color: #999; border-bottom: 1px solid #333; font-weight: normal; font-size: 0.85em; text-transform: uppercase; }
+		tr:hover { background: #1e272c; }
+		td:first-child { font-weight: bold; }
+		a { color: #6cb4ee; text-decoration: none; }
+		a:hover { text-decoration: underline; }
+		.links { display: flex; gap: 1em; }
+	</style>
+</head>
+<body>
+	<h1>Three.js Examples</h1>
+	<p class="subtitle">Each example can run in WebGL (default) or WebGPU (append <code>?webgpu</code>).</p>
+	<table>
+		<thead>
+			<tr><th>Example</th><th>Links</th></tr>
+		</thead>
+		<tbody>
+			<tr><td>3D Tiles Viewer</td><td class="links"><a href="tilesViewer.html">WebGL</a> <a href="tilesViewer.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>B3DM Loader</td><td class="links"><a href="b3dmExample.html">WebGL</a> <a href="b3dmExample.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Cesium Compare</td><td class="links"><a href="cesiumCompare.html">WebGL</a> <a href="cesiumCompare.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>CMPT Loader</td><td class="links"><a href="cmptExample.html">WebGL</a> <a href="cmptExample.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Custom Material</td><td class="links"><a href="customMaterial.html">WebGL</a> <a href="customMaterial.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Deep Zoom Image</td><td class="links"><a href="deepZoom.html">WebGL</a> <a href="deepZoom.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Ellipsoid Region</td><td class="links"><a href="ellipsoid.html">WebGL</a> <a href="ellipsoid.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Fading Tiles</td><td class="links"><a href="fadingTiles.html">WebGL</a> <a href="fadingTiles.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>GeoJSON Overlay</td><td class="links"><a href="geojson.html">WebGL</a> <a href="geojson.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Google Maps Aerial</td><td class="links"><a href="googleMapsAerial.html">WebGL</a> <a href="googleMapsAerial.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Google Maps</td><td class="links"><a href="googleMapsExample.html">WebGL</a> <a href="googleMapsExample.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>I3DM Loader</td><td class="links"><a href="i3dmExample.html">WebGL</a> <a href="i3dmExample.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Cesium Ion</td><td class="links"><a href="ionExample.html">WebGL</a> <a href="ionExample.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Cesium Ion Lunar</td><td class="links"><a href="ionLunar.html">WebGL</a> <a href="ionLunar.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Landform Site Overlay</td><td class="links"><a href="landformSiteOverlay.html">WebGL</a> <a href="landformSiteOverlay.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Load Region</td><td class="links"><a href="loadRegion.html">WebGL</a> <a href="loadRegion.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Map Tiles (XYZ)</td><td class="links"><a href="mapTiles.html">WebGL</a> <a href="mapTiles.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Mars Terrain</td><td class="links"><a href="mars.html">WebGL</a> <a href="mars.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Metadata</td><td class="links"><a href="metadata.html">WebGL</a> <a href="metadata.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>Offscreen Shadows</td><td class="links"><a href="offscreenShadows.html">WebGL</a> <a href="offscreenShadows.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>PNTS Loader</td><td class="links"><a href="pntsExample.html">WebGL</a> <a href="pntsExample.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>QuantMesh Overlays</td><td class="links"><a href="quantMeshOverlays.html">WebGL</a> <a href="quantMeshOverlays.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>VR</td><td class="links"><a href="vr.html">WebGL</a> <a href="vr.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>WMS Tiles</td><td class="links"><a href="wmsTiles.html">WebGL</a> <a href="wmsTiles.html?webgpu">WebGPU</a></td></tr>
+			<tr><td>WMTS Tiles</td><td class="links"><a href="wmtsTiles.html">WebGL</a> <a href="wmtsTiles.html?webgpu">WebGPU</a></td></tr>
+		</tbody>
+	</table>
+</body>
 </html>

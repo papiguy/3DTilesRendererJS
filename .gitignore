@@ -69,3 +69,7 @@ example/dev-bundle
 build
 
 pnpm-lock.yaml
+
+# Claude Code
+.claude/
+CLAUDE.md

@@ -2,6 +2,8 @@ import { WebGLArrayRenderTarget, MeshBasicMaterial, DataTexture, REVISION } from
 import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { ExpandingBatchedMesh } from './ExpandingBatchedMesh.js';
 import { convertMapToArrayTexture, isColorWhite } from './utilities.js';
+import { convertMapToArrayTextureWebGPU } from './utilities.webgpu.js';
+import { isWebGPURenderer, getMax3DTextureSize } from '../../renderer/utils/RendererUtils.js';
 
 const _textureRenderQuad = new FullScreenQuad( new MeshBasicMaterial() );
 const _whiteTex = new DataTexture( new Uint8Array( [ 255, 255, 255, 255 ] ), 1, 1 );
@@ -34,8 +36,9 @@ export class BatchedTilesPlugin {
 		this.name = 'BATCHED_TILES_PLUGIN';
 		this.priority = - 1;
 
-		// limit the amount of instances to the size of a 3d texture to avoid over flowing the
-		const gl = options.renderer.getContext();
+		// Detect renderer type and get max texture size using abstraction
+		this._isWebGPU = isWebGPURenderer( options.renderer );
+		const maxTextureSize = getMax3DTextureSize( options.renderer );
 
 		// save options
 		this.instanceCount = options.instanceCount;
@@ -43,7 +46,7 @@ export class BatchedTilesPlugin {
 		this.indexCount = options.indexCount;
 		this.material = options.material ? options.material.clone() : null;
 		this.expandPercent = options.expandPercent;
-		this.maxInstanceCount = Math.min( options.maxInstanceCount, gl.getParameter( gl.MAX_3D_TEXTURE_SIZE ) );
+		this.maxInstanceCount = Math.min( options.maxInstanceCount, maxTextureSize );
 		this.renderer = options.renderer;
 		this.discardOriginalContent = options.discardOriginalContent;
 		this.textureSize = options.textureSize;
@@ -96,9 +99,17 @@ export class BatchedTilesPlugin {
 			magFilter: map.magFilter,
 		};
 
-		const arrayTarget = new WebGLArrayRenderTarget( textureSize || map.image.width, textureSize || map.image.height, instanceCount );
-		Object.assign( arrayTarget.texture, textureOptions );
-		renderer.initRenderTarget( arrayTarget );
+		const width = textureSize || map.image.width;
+		const height = textureSize || map.image.height;
+
+		// Create appropriate render target based on renderer type
+		const arrayTarget = this._createArrayRenderTarget( width, height, instanceCount, textureOptions );
+
+		if ( renderer.initRenderTarget ) {
+
+			renderer.initRenderTarget( arrayTarget );
+
+		}
 
 		// assign the material
 		batchedMesh.material.map = arrayTarget.texture;
@@ -116,6 +127,16 @@ export class BatchedTilesPlugin {
 			} );
 
 		} );
+
+	}
+
+	// Helper to create appropriate array render target for the renderer type
+	_createArrayRenderTarget( width, height, depth, options = {} ) {
+
+		// WebGLArrayRenderTarget wraps a DataArrayTexture and works with both renderer backends.
+		const target = new WebGLArrayRenderTarget( width, height, depth );
+		Object.assign( target.texture, options );
+		return target;
 
 	}
 
@@ -137,7 +158,16 @@ export class BatchedTilesPlugin {
 		tiles.group.add( batchedMesh );
 		batchedMesh.updateMatrixWorld();
 
-		convertMapToArrayTexture( batchedMesh.material );
+		// Use appropriate array texture conversion based on renderer type
+		if ( this._isWebGPU ) {
+
+			convertMapToArrayTextureWebGPU( batchedMesh.material );
+
+		} else {
+
+			convertMapToArrayTexture( batchedMesh.material );
+
+		}
 
 		this.batchedMesh = batchedMesh;
 
@@ -249,12 +279,40 @@ export class BatchedTilesPlugin {
 				magFilter: arrayTarget.texture.magFilter,
 			};
 
-			const newArrayTarget = new WebGLArrayRenderTarget( arrayTarget.width, arrayTarget.height, targetDepth );
-			Object.assign( newArrayTarget.texture, textureOptions );
+			// Use helper to create appropriate render target
+			const newArrayTarget = this._createArrayRenderTarget(
+				arrayTarget.width,
+				arrayTarget.height,
+				targetDepth,
+				textureOptions
+			);
 
 			// copy the contents
-			renderer.initRenderTarget( newArrayTarget );
-			renderer.copyTextureToTexture( arrayTarget.texture, newArrayTarget.texture );
+			if ( renderer.initRenderTarget ) {
+
+				renderer.initRenderTarget( newArrayTarget );
+
+			}
+
+			if ( this._isWebGPU ) {
+
+				// WebGPU backend copyTextureToTexture copies one array layer at a time.
+				for ( let i = 0, l = arrayTarget.depth; i < l; i ++ ) {
+
+					renderer.copyTextureToTexture(
+						arrayTarget.texture,
+						newArrayTarget.texture,
+						{ x: 0, y: 0, z: i, width: arrayTarget.width, height: arrayTarget.height },
+						{ x: 0, y: 0, z: i },
+					);
+
+				}
+
+			} else {
+
+				renderer.copyTextureToTexture( arrayTarget.texture, newArrayTarget.texture );
+
+			}
 
 			// replace the old array target
 			arrayTarget.dispose();

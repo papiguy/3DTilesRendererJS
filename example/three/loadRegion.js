@@ -8,7 +8,6 @@ import {
 } from '3d-tiles-renderer/plugins';
 import {
 	Scene,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Mesh,
 	Vector3,
@@ -17,6 +16,7 @@ import {
 	Clock,
 	Line,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 
 let camera, controls, scene, renderer, tiles;
@@ -35,15 +35,14 @@ const params = {
 
 };
 
-init();
-animate();
+init().then( animate );
 
-function init() {
+async function init() {
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );

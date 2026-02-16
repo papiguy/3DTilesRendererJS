@@ -1,12 +1,13 @@
-import { wrapFadeMaterial } from './wrapFadeMaterial.js';
+import { createFadeMaterial } from './FadeMaterialFactory.js';
 
 // Class for managing and updating extended fade parameters
 export class FadeMaterialManager {
 
-	constructor() {
+	constructor( renderer = null ) {
 
 		this._fadeParams = new WeakMap();
 		this.fading = 0;
+		this.renderer = renderer;
 
 	}
 
@@ -99,7 +100,7 @@ export class FadeMaterialManager {
 
 		}
 
-		fadeParams.set( material, wrapFadeMaterial( material, material.onBeforeCompile ) );
+		fadeParams.set( material, createFadeMaterial( material, this.renderer, material.onBeforeCompile ) );
 
 	}
 

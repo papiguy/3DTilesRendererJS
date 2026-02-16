@@ -4,11 +4,11 @@ import {
 	Scene,
 	DirectionalLight,
 	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Group,
 	FogExp2,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { TopoLinesPlugin } from './src/plugins/topolines/TopoLinesPlugin.js';
 
@@ -24,16 +24,15 @@ const params = {
 
 };
 
-init();
-render();
+init().then( render );
 
-function init() {
+async function init() {
 
 	const fog = new FogExp2( 0xd8cec0, .0075, 250 );
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0xd8cec0 );

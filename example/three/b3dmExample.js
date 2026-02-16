@@ -2,88 +2,109 @@ import { B3DMLoader } from '3d-tiles-renderer';
 import {
 	Scene,
 	Group,
-	DirectionalLight,
-	AmbientLight,
-	WebGLRenderer,
 	PerspectiveCamera,
 	Box3,
-	PCFSoftShadowMap,
 	Vector2,
 	Raycaster,
-	ShaderLib,
-	UniformsUtils,
-	ShaderMaterial,
 	Color,
+	MeshBasicMaterial,
+	Float32BufferAttribute,
 } from 'three';
+import { createRenderer } from '../createRenderer.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 let camera, controls, scene, renderer, offsetGroup;
-let dirLight;
 let raycaster, mouse;
 let model;
 let infoEl;
+const HIGHLIGHT_COLOR = new Color( 0xFFC107 );
 
-init();
-animate();
+init().then( animate );
 
-// Adjusts the three.js standard shader to include batchid highlight
-function batchIdHighlightShaderMixin( shader ) {
+function convertToUnlitBatchMaterial( material, hasBatchIdAttribute ) {
 
-	const newShader = { ...shader };
-	newShader.uniforms = {
-		highlightedBatchId: { value: - 1 },
-		highlightColor: { value: new Color( 0xFFC107 ).convertSRGBToLinear() },
-		...UniformsUtils.clone( shader.uniforms ),
-	};
-	newShader.extensions = {
-		derivatives: true,
-	};
-	newShader.lights = true;
-	newShader.vertexShader =
-		`
-			attribute float _batchid;
-			varying float batchid;
-		` +
-		newShader.vertexShader.replace(
-			/#include <uv_vertex>/,
-			`
-			#include <uv_vertex>
-			batchid = _batchid;
-			`
-		);
-	newShader.fragmentShader =
-		`
-			varying float batchid;
-			uniform float highlightedBatchId;
-			uniform vec3 highlightColor;
-		` +
-		newShader.fragmentShader.replace(
-			/vec4 diffuseColor = vec4\( diffuse, opacity \);/,
-			`
-			vec4 diffuseColor =
-				abs( batchid - highlightedBatchId ) < 0.5 ?
-				vec4( highlightColor, opacity ) :
-				vec4( diffuse, opacity );
-			`
-		);
+	const map = material.map || material.emissiveMap || null;
+	const basic = new MeshBasicMaterial( {
+		map,
+		// If a texture map is present use white so texture colors are preserved.
+		color: map ? new Color( 0xffffff ) : ( material.color ? material.color.clone() : new Color( 0xffffff ) ),
+		transparent: material.transparent,
+		opacity: material.opacity,
+		side: material.side,
+		alphaTest: material.alphaTest,
+		wireframe: material.wireframe,
+		vertexColors: hasBatchIdAttribute,
+	} );
 
-	return newShader;
+	return basic;
 
 }
 
-function init() {
+function updateMeshBatchHighlight( mesh, hoveredBatchid ) {
+
+	const batchidAttr = mesh.geometry.getAttribute( '_batchid' );
+	if ( ! batchidAttr ) {
+
+		return;
+
+	}
+
+	let colorAttr = mesh.geometry.getAttribute( 'color' );
+	if ( ! mesh.userData._baseVertexColor || ! colorAttr || colorAttr.count !== batchidAttr.count || ! colorAttr.isFloat32BufferAttribute ) {
+
+		const baseColors = new Float32Array( batchidAttr.count * 3 );
+		if ( colorAttr && colorAttr.count === batchidAttr.count ) {
+
+			for ( let i = 0, l = colorAttr.count; i < l; i ++ ) {
+
+				baseColors[ i * 3 + 0 ] = colorAttr.getX( i );
+				baseColors[ i * 3 + 1 ] = colorAttr.getY( i );
+				baseColors[ i * 3 + 2 ] = colorAttr.getZ( i );
+
+			}
+
+		} else {
+
+			baseColors.fill( 1 );
+
+		}
+
+		mesh.userData._baseVertexColor = baseColors;
+		colorAttr = new Float32BufferAttribute( baseColors.slice(), 3 );
+		mesh.geometry.setAttribute( 'color', colorAttr );
+
+	}
+
+	const baseColors = mesh.userData._baseVertexColor;
+	const colors = colorAttr.array;
+	for ( let i = 0, l = batchidAttr.count; i < l; i ++ ) {
+
+		const isHighlighted = hoveredBatchid !== - 1 && batchidAttr.getX( i ) === hoveredBatchid;
+		const color = isHighlighted ? HIGHLIGHT_COLOR : null;
+		const br = baseColors[ i * 3 + 0 ];
+		const bg = baseColors[ i * 3 + 1 ];
+		const bb = baseColors[ i * 3 + 2 ];
+		colors[ i * 3 + 0 ] = color ? br * 0.65 + color.r * 0.35 : br;
+		colors[ i * 3 + 1 ] = color ? bg * 0.65 + color.g * 0.35 : bg;
+		colors[ i * 3 + 2 ] = color ? bb * 0.65 + color.b * 0.35 : bb;
+
+	}
+
+	colorAttr.needsUpdate = true;
+
+}
+
+async function init() {
 
 	infoEl = document.getElementById( 'hover-info' );
 
 	scene = new Scene();
 
 	// primary camera view
-	renderer = new WebGLRenderer( { antialias: true } );
+	renderer = await createRenderer( { antialias: true } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	renderer.setClearColor( 0x151c1f );
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMap.type = PCFSoftShadowMap;
 
 	document.body.appendChild( renderer.domElement );
 
@@ -95,25 +116,6 @@ function init() {
 	controls.screenSpacePanning = false;
 	controls.minDistance = 1;
 	controls.maxDistance = 2000;
-
-	// lights
-	dirLight = new DirectionalLight( 0xffffff, 1.25 );
-	dirLight.position.set( 1, 2, 3 ).multiplyScalar( 40 );
-	dirLight.castShadow = true;
-	dirLight.shadow.bias = - 0.01;
-	dirLight.shadow.mapSize.setScalar( 2048 );
-
-	const shadowCam = dirLight.shadow.camera;
-	shadowCam.left = - 200;
-	shadowCam.bottom = - 200;
-	shadowCam.right = 200;
-	shadowCam.top = 200;
-	shadowCam.updateProjectionMatrix();
-
-	scene.add( dirLight );
-
-	const ambLight = new AmbientLight( 0xffffff, 0.05 );
-	scene.add( ambLight );
 
 	offsetGroup = new Group();
 	scene.add( offsetGroup );
@@ -138,7 +140,26 @@ function init() {
 
 				if ( c.isMesh ) {
 
-					c.material = new ShaderMaterial( batchIdHighlightShaderMixin( ShaderLib.standard ) );
+					const hasBatchIdAttribute = Boolean( c.geometry.getAttribute( '_batchid' ) );
+					if ( Array.isArray( c.material ) ) {
+
+						c.material = c.material.map( m => convertToUnlitBatchMaterial( m, hasBatchIdAttribute ) );
+
+					} else {
+
+						c.material = convertToUnlitBatchMaterial( c.material, hasBatchIdAttribute );
+
+					}
+
+					// Initialize the vertex color attribute immediately so it exists
+					// before the first render. WebGPU requires all attributes declared
+					// by the material to be present on the geometry; deferring creation
+					// until the first mousemove causes a pipeline validation error.
+					if ( hasBatchIdAttribute ) {
+
+						updateMeshBatchHighlight( c, - 1 );
+
+					}
 
 				}
 
@@ -222,7 +243,7 @@ function onMouseMove( e ) {
 
 			if ( c.isMesh ) {
 
-				c.material.uniforms.highlightedBatchId.value = hoveredBatchid;
+				updateMeshBatchHighlight( c, hoveredBatchid );
 
 			}
 

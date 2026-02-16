@@ -1,4 +1,4 @@
-import { searchForWorkspaceRoot, loadEnv } from 'vite';
+import { defineConfig, searchForWorkspaceRoot, loadEnv } from 'vite';
 import fs from 'fs';
 import react from '@vitejs/plugin-react';
 import path from 'path';
@@ -17,7 +17,7 @@ export const packageAliases = {
 	'3d-tiles-renderer': path.resolve( './src/index.js' ),
 };
 
-export default ( { mode } ) => {
+export default defineConfig( ( { mode } ) => {
 
 	process.env = { ...process.env, ...loadEnv( mode, process.cwd() ) };
 
@@ -54,4 +54,4 @@ export default ( { mode } ) => {
 		plugins: [ react() ],
 	};
 
-};
+} );
