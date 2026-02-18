@@ -79,7 +79,8 @@ function initTiles() {
 	tiles.registerPlugin( new XYZTilesPlugin( {
 		center: true,
 		shape: params.planar ? 'planar' : 'ellipsoid',
-		url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+		url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+		imageOrientation: renderer.backend?.isWebGPUBackend ? 'none' : 'flipY',
 	} ) );
 
 	tiles.lruCache.minSize = 900;
