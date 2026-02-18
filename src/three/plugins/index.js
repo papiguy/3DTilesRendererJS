@@ -1,5 +1,6 @@
 // three.js plugins
 export * from './CesiumIonAuthPlugin.js';
+export * from './GoogleCloudAuthPlugin.js';
 export * from './UpdateOnChangePlugin.js';
 export * from './TileCompressionPlugin.js';
 export * from './GLTFExtensionsPlugin.js';

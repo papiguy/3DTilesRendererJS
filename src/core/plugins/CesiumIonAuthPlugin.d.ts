@@ -1,4 +1,4 @@
-import { TilesRendererBase } from '3d-tiles-renderer/core';
+import { TilesRendererBase } from '../renderer/index.js';
 
 export class CesiumIonAuthPlugin {
 

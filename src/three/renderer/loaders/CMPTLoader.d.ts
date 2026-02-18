@@ -1,4 +1,4 @@
-import { B3DMBaseResult, I3DMBaseResult, PNTSBaseResult, CMPTLoaderBase } from '3d-tiles-renderer/core';
+import { B3DMBaseResult, I3DMBaseResult, PNTSBaseResult, CMPTLoaderBase } from '../../../core/renderer/index.js';
 import { Group, LoadingManager } from 'three';
 
 export interface CMPTResult {

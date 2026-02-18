@@ -18,3 +18,6 @@ export class CesiumIonAuthPlugin extends CesiumIonAuthPluginDeprecated {
 	}
 
 }
+
+// Explicitly re-export to avoid star-export name ambiguity between core and three plugin barrels.
+export { GoogleCloudAuthPlugin } from './core/plugins/GoogleCloudAuthPlugin.js';
