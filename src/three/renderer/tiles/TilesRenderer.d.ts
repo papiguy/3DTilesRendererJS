@@ -1,5 +1,5 @@
-import { Box3, Camera, Vector2, Matrix4, WebGLRenderer, Object3D, LoadingManager, Sphere, EventListener, EventDispatcher, BaseEvent } from 'three';
-import { Tile, TilesRendererBase } from '3d-tiles-renderer/core';
+import { Box3, Camera, Vector2, Matrix4, WebGLRenderer, Renderer, Object3D, LoadingManager, Sphere, EventListener, EventDispatcher, BaseEvent } from 'three';
+import { Tile, TilesRendererBase } from '../../../core/renderer/index.js';
 import { TilesGroup } from './TilesGroup.js';
 import { Ellipsoid } from '../math/Ellipsoid.js';
 
@@ -34,6 +34,7 @@ export class TilesRenderer<TEventMap extends TilesRendererEventMap = TilesRender
 	manager : LoadingManager;
 
 	group : TilesGroup;
+	constructor( url?: string, renderer?: WebGLRenderer | Renderer );
 
 	getBoundingBox( box : Box3 ) : boolean;
 	getOrientedBoundingBox( box : Box3, matrix : Matrix4 ) : boolean;
@@ -45,7 +46,7 @@ export class TilesRenderer<TEventMap extends TilesRendererEventMap = TilesRender
 
 	setResolution( camera : Camera, x : number, y : number ) : boolean;
 	setResolution( camera : Camera, resolution : Vector2 ) : boolean;
-	setResolutionFromRenderer( camera : Camera, renderer : WebGLRenderer ) : boolean;
+	setResolutionFromRenderer( camera : Camera, renderer : WebGLRenderer | Renderer ) : boolean;
 
 	forEachLoadedModel( callback : ( scene : Object3D, tile : Tile ) => void ) : void;
 

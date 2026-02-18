@@ -1,4 +1,4 @@
-import { LoaderBase } from '3d-tiles-renderer/core';
+import { LoaderBase } from '../../../core/renderer/index.js';
 
 interface WMTSBoundingBox {
 	crs: string,

@@ -1,4 +1,4 @@
-import { PNTSBaseResult, PNTSLoaderBase, BatchTable, FeatureTable } from '3d-tiles-renderer/core';
+import { PNTSBaseResult, PNTSLoaderBase, BatchTable, FeatureTable } from '../../../core/renderer/index.js';
 import { Points, LoadingManager } from 'three';
 
 interface PNTSScene extends Points {

@@ -1,4 +1,4 @@
-import { TilesRendererBase } from '3d-tiles-renderer/core';
+import { TilesRendererBase } from '../../core/renderer/index.js';
 import { Scene, TransformNode } from '@babylonjs/core';
 
 export class TilesRenderer extends TilesRendererBase {
