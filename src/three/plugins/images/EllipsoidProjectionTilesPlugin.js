@@ -129,6 +129,10 @@ export class EllipsoidProjectionTilesPlugin extends ImageFormatPlugin {
 
 			}
 
+			position.needsUpdate = true;
+			normal.needsUpdate = true;
+			uv.needsUpdate = true;
+
 			mesh.geometry = geometry;
 			mesh.position.copy( _sphere.center );
 

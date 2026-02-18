@@ -23,7 +23,7 @@ export class XYZTilesPlugin extends EllipsoidProjectionTilesPlugin {
 		super( rest );
 
 		this.name = 'XYZ_TILES_PLUGIN';
-		this.imageSource = new XYZImageSource( { url, levels, tileDimension, projection } );
+		this.imageSource = new XYZImageSource( { url, levels, tileDimension, projection, ...rest } );
 
 	}
 
@@ -41,7 +41,7 @@ export class TMSTilesPlugin extends EllipsoidProjectionTilesPlugin {
 		super( rest );
 
 		this.name = 'TMS_TILES_PLUGIN';
-		this.imageSource = new TMSImageSource( { url } );
+		this.imageSource = new TMSImageSource( { url, ...rest } );
 
 	}
 
@@ -69,7 +69,8 @@ export class WMTSTilesPlugin extends EllipsoidProjectionTilesPlugin {
 			layer,
 			tileMatrixSet,
 			style,
-			dimensions
+			dimensions,
+			...rest
 		} );
 
 	}
@@ -101,7 +102,8 @@ export class WMSTilesPlugin extends EllipsoidProjectionTilesPlugin {
 			format,
 			tileDimension,
 			styles,
-			version
+			version,
+			...rest
 		} );
 
 	}
