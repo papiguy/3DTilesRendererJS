@@ -13,7 +13,7 @@ export class DeepZoomImagePlugin extends ImageFormatPlugin {
 		super( rest );
 
 		this.name = 'DZI_TILES_PLUGIN';
-		this.imageSource = new DeepZoomImageSource( { url } );
+		this.imageSource = new DeepZoomImageSource( { url, ...rest } );
 
 	}
 

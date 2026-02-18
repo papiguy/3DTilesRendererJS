@@ -11,12 +11,14 @@ export class TiledImageSource extends DataCache {
 		super();
 
 		const {
-			fetchOptions = {}
+			fetchOptions = {},
+			imageOrientation = 'flipY',
 		} = options;
 
 		this.tiling = new TilingScheme();
 		this.fetchOptions = fetchOptions;
 		this.fetchData = ( ...args ) => fetch( ...args );
+		this.imageOrientation = imageOrientation;
 
 	}
 
@@ -31,7 +33,7 @@ export class TiledImageSource extends DataCache {
 		const imageBitmap = await createImageBitmap( blob, {
 			premultiplyAlpha: 'none',
 			colorSpaceConversion: 'none',
-			imageOrientation: 'flipY',
+			imageOrientation: this.imageOrientation,
 		} );
 		const texture = new Texture( imageBitmap );
 		texture.generateMipmaps = false;

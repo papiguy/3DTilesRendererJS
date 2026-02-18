@@ -119,8 +119,28 @@ export class ImageFormatPlugin {
 		// adjust the geometry transform itself rather than the mesh because it reduces the artifact errors
 		// when using batched mesh rendering.
 		const geometry = new PlaneGeometry( 2 * sx, 2 * sy );
-		const mesh = new Mesh( geometry, new MeshBasicMaterial( { map: texture, transparent: true } ) );
+		const material = new MeshBasicMaterial( { map: texture, transparent: true } );
+		const mesh = new Mesh( geometry, material );
 		mesh.position.set( x, y, z );
+
+		// WebGPU: Avoid z-fighting between different levels of detail
+		if ( this.imageSource.imageOrientation === 'none' ) {
+
+			material.polygonOffset = true;
+			material.polygonOffsetFactor = - 1;
+			material.polygonOffsetUnits = - 1;
+
+		}
+
+		// Adjust polygon offset for hierarchy
+		// Use a large offset to ensure children are drawn on top of parents
+		material.polygonOffset = true;
+		material.polygonOffsetFactor += - level;
+		material.polygonOffsetUnits += - level * 10;
+		material.depthWrite = false;
+		material.depthTest = true;
+
+		mesh.renderOrder = level;
 
 		const tiling = imageSource.tiling;
 		const uvRange = tiling.getTileContentUVBounds( tx, ty, level );
