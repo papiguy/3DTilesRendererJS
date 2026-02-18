@@ -76,11 +76,12 @@ npm install 3d-tiles-renderer --save
 Running examples locally:
 
 ```bash
-npm install       # install dependencies
-npm start         # dev server at localhost:5173
+npm install            # install dependencies
+npm run build-examples # build examples
+npm start              # dev server at localhost:5173
 ```
 
-Then open `http://localhost:5173/three/<demo>.html` (e.g. `fadingTiles.html`).
+Then open `http://localhost:5173/three/` or `http://localhost:5173/three/<demo>.html` (e.g. `fadingTiles.html`).
 
 Demos that use Cesium Ion or Google Maps require API keys. Create a `.env` file in the repo root:
 

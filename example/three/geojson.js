@@ -103,6 +103,7 @@ async function init() {
 			center: true,
 			shape: 'ellipsoid',
 			url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+			imageOrientation: renderer.backend?.isWebGPUBackend ? 'none' : 'flipY',
 		} ),
 	);
 
