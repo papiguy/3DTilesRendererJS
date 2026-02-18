@@ -135,8 +135,8 @@ export class ImageFormatPlugin {
 		// Adjust polygon offset for hierarchy
 		// Use a large offset to ensure children are drawn on top of parents
 		material.polygonOffset = true;
-		material.polygonOffsetFactor += - level;
-		material.polygonOffsetUnits += - level * 10;
+		material.polygonOffsetFactor = - level;
+		material.polygonOffsetUnits = - level * 10;
 		material.depthWrite = false;
 		material.depthTest = true;
 
